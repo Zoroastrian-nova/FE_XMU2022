@@ -14669,7 +14669,8 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <p>设连续复利利率为r，每月计息利率为$r_{12}$，终值为$FV$，现值为$PV$，每月支付的利息为$pmt_{i}$，假设存款本息之和逐月摊销支付，存款期限为一年。</p>
 <p>首先求出本息和的终值：$FV = PV*e^{r} = 33824.9055$</p>
 <p>此时再算出一年计息12次时的利息：$r_{12} = m (e^{\frac{r}{m}}) - 1 = 12(e^{\frac{0.12}{12}}) - 1 = 0.12749685 = 12.749685\%$</p>
-<p>最后，按照$r_{12}$将$FV$摊销到12个月,即在下式解出$pmt_{i}$： $\Sigma_{t=1}^{12} pmt_{i}(1+r_{12})^{t} = FV = 33824.9055$,</p>
+<p>最后，按照$r_{12}$将$FV$摊销到12个月,即在下式解出$pmt_{i}$： $\Sigma_{t=1}^{n} pmt_{i}(1+r_{n})^{t} = FV$,</p>
+<p>可得，$pmt_{i} = \frac{FV}{\Sigma_{t=1}^{n} (1+r_{12})^{t}} = \frac{33824.9055}{\Sigma_{t=1}^{12} (1.12749)^{t}}$</p>
 <p>解得$pmt_{i} = 1339.01777$</p>
 
 </div>
@@ -14684,15 +14685,11 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">e</span>
-<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">root</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">r</span><span class="p">,</span><span class="n">pv</span><span class="p">,</span><span class="n">m</span> <span class="o">=</span> <span class="mf">0.12</span><span class="p">,</span><span class="mi">30000</span><span class="p">,</span><span class="mi">12</span>
 <span class="n">fv</span> <span class="o">=</span> <span class="n">pv</span><span class="o">*</span><span class="n">e</span><span class="o">**</span><span class="n">r</span>
 <span class="n">r_12</span> <span class="o">=</span> <span class="n">m</span><span class="o">*</span><span class="p">(</span><span class="n">e</span><span class="o">**</span><span class="n">r</span><span class="o">/</span><span class="n">m</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
-<span class="k">def</span> <span class="nf">annuality_payment</span><span class="p">(</span><span class="n">pmt</span><span class="p">):</span>
-    <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">r_12</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">))))</span>
-    <span class="k">return</span> <span class="n">fv</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">pmt</span><span class="o">*</span><span class="n">i</span><span class="p">)</span>
-<span class="n">interest_payment</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">root</span><span class="p">(</span><span class="n">fun</span><span class="o">=</span><span class="n">annuality_payment</span><span class="p">,</span><span class="n">x0</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">])</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+<span class="n">interest_payment</span> <span class="o">=</span> <span class="n">fv</span><span class="o">/</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">r_12</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">))))))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">interest_payment</span><span class="p">)</span>
 </pre></div>
 
@@ -14715,7 +14712,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>1339.017779792237
+<pre>1339.0177797922368
 </pre>
 </div>
 </div>
@@ -14747,6 +14744,12 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>设S&amp;P500 指数变动幅度为R，总收益为P</p>
 <p>可得总收益$P = max(40\%R, 4\%)$</p>
+<p>即:
+P =
+\begin{cases} 
+4\%,  &amp; \text{if }\text{ $R \leq 0.1$} \\
+40\%R , &amp; \text{if }\text{ R &gt; 0.1}
+\end{cases}</p>
 <p>作图过程如下：</p>
 
 </div>
